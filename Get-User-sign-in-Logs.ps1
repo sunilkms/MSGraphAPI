@@ -12,8 +12,9 @@
 
 function GetSignInLogs {
 param ($upn, [switch]$getfailed,$DateGTE)
+if ($dateGTE) {
 if ($DateGTE -notmatch "\d{4}-[0-1][0-2]-\d{2}") { Write-Host "Supplied date format is not correct, please use date format as 'YYYY-MM-DD'" -ForegroundColor Yellow ;break}
-
+}
 #///////////////////MODIFY THE DETAILS BELOW/////////////////////////////////////
 $Office365Username='adminuserid'
 $Office365Password='Password'
