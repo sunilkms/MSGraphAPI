@@ -11,18 +11,19 @@
 #https://www.sunilchauhan.info/2019/02/working-with-microsoft-graph-api-using_10.html
 
 function GetSignInLogs {
-
 param ($upn, [switch]$getfailed,$DateGTE)
 if ($DateGTE -notmatch "\d{4}-[0-1][0-2]-\d{2}") { Write-Host "Supplied date format is not correct, please use date format as 'YYYY-MM-DD'" -ForegroundColor Yellow ;break}
 
+#///////////////////MODIFY THE DETAILS BELOW/////////////////////////////////////
+$Office365Username='adminuserid'
+$Office365Password='Password'
 $clientId = "c14a2820-b922-4139-901b-36024950fc95"
+#////////////////////////////////////////////////////////////////////////////////
+
 $redirectUri = "https://localhost"
 $resourceURI = "https://graph.microsoft.com"
 $authority = "https://login.microsoftonline.com/common"
-#Remove commenting on username and password if you want to run this without a prompt.
-$Office365Username='adminuserid'
-$Office365Password='Password'
-#pre requisites
+
 try {
 $AadModule = Import-Module -Name AzureAD -ErrorAction Stop -PassThru
 }
@@ -51,28 +52,21 @@ $platformParameters = New-Object "Microsoft.IdentityModel.Clients.ActiveDirector
 $authResult = $authContext.AcquireTokenAsync($resourceURI, $ClientID, $RedirectUri, $platformParameters)
 }
 $accessToken = $authResult.result.AccessToken
-
-#https://graph.microsoft.com/beta//auditLogs/signIns?$filter=userPrincipalName eq 'testus@lab365.ml'
-#$upn = "sc@lab365.gq"
 $apiUrl = 'https://graph.microsoft.com/beta/auditLogs/signIns?' + "`$filter=userPrincipalName eq " + "'" + $upn + "'"
-
 if ($DateGTE) {
 #$DateGTE = "2019-02-10"
 $apiUrl = 'https://graph.microsoft.com/beta/auditLogs/signIns?' + "`$filter=userPrincipalName eq " + "'" + $upn + "'" + " and createdDateTime ge " + $DateGTE
-
 }
-
 $Data = Invoke-RestMethod -Headers @{Authorization = "Bearer $accessToken"} -Uri $apiUrl -Method Get
 $PR = $Data.value
 
-if ($getfailed) {
-
-$PR | ? {$_.status.errorCode -ne 0} | select createdDateTime,userPrincipalName,appDisplayName,clientAppUsed,Status,ipAddress,conditionalAccessStatus,
-@{N="OS";E={$_.deviceDetail.operatingSystem}} | ft
-
-} else {
-
+if ($getfailed) 
+   {
+    $PR | ? {$_.status.errorCode -ne 0} | select createdDateTime,userPrincipalName,appDisplayName,clientAppUsed,Status,ipAddress,conditionalAccessStatus,
+    @{N="OS";E={$_.deviceDetail.operatingSystem}
+    }
+    } 
+else {
 $pr | select createdDateTime,userPrincipalName,appDisplayName,clientAppUsed,Status,ipAddress,conditionalAccessStatus,
 @{N="OS";E={$_.deviceDetail.operatingSystem}}}
-
 }
