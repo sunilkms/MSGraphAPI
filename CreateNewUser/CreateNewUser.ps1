@@ -63,14 +63,14 @@ $Header = @{
             'Authorization' = $AccessToken.CreateAuthorizationHeader()
           }
 
-#----Jason Construction--
+#----Json Construction--
 $displayName="'" + $displayName + "'"
 $mailNickname="'" + $alias + "'"
 $UPN= "'" + $alias + '@' +$domain + "'"
 $Method="POST"
 $password = "'" + $password + "'"
 
-$JASON=@"
+$JSON=@"
 {
   "accountEnabled": true,
   "displayName": $displayName,
@@ -85,5 +85,5 @@ $JASON=@"
 
 #post to graph using rest method
 $URI="https://graph.microsoft.com/v1.0/users"
-$Results = Invoke-RestMethod -Headers $Header -Uri $Uri -Method POST -Body $JASON -ContentType "application/json”
+$Results = Invoke-RestMethod -Headers $Header -Uri $Uri -Method POST -Body $JSON -ContentType "application/json”
 }
