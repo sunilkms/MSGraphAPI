@@ -14,7 +14,6 @@ $surname,$usageLocation,$userPrincipalName,$userType
 ------------------------------------------------------------------------------------------------
 ```
 #### More details on the usage of these attribute can be found [here](https://docs.microsoft.com/en-us/graph/api/user-update?view=graph-rest-1.0).
-----------------------------------------------------------------------------------------------
 
 ### This script foucuses on the below attributes only
 *Attibute from the list above can be included in the JSON to update the user* 
