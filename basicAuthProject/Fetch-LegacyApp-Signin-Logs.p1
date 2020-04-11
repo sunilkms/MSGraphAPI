@@ -18,7 +18,7 @@
 # 
 #---------------------------------------------------------------------------------------------------
 param (        
-        $Office365Username="labadmin@lab365.in",
+        $Office365Username="admin@lab365.in",
         $Office365Password="myadminpassword",
         $clientId = "8e5a2e83-xxxx-xxxx-xxxx-262ec347xxxx" # replace with your client app ID
         )
