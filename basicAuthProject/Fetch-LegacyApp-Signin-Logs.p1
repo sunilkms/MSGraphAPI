@@ -23,8 +23,7 @@ param (
         $clientId = "8e5a2e83-xxxx-xxxx-xxxx-262ec347xxxx" # replace with your client app ID
         )
 ""
-#--------------------------------------------------------------------------------------------
-
+""
 Write-Host "--------------------" -NoNewline -ForegroundColor Cyan
 Write-Host "www.lab365.in" -NoNewline -ForegroundColor Yellow
 Write-Host "------------------------------" -ForegroundColor Cyan -NoNewline
@@ -144,11 +143,19 @@ if (!$authResult.result)
             {
             Write-Host " "
             Write-Host "Script failed while fetching authtoken using seemless method." -ForegroundColor Yellow
-            Write-Host "Now trying to fetch authtoken using MFA" -ForegroundColor Yellow
+            Write-Host "Now trying to fetch authtoken using MFA" -ForegroundColor Yellow -NoNewline
+            $adal = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
+            $adalforms = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
+            [System.Reflection.Assembly]::LoadFrom($adal) | Out-Null
+            [System.Reflection.Assembly]::LoadFrom($adalforms) | Out-Null
+            $authContext = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext" -ArgumentList $authority
+
+            #Build Azure AD credentials object
             $platformParameters = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.PlatformParameters" -ArgumentList "Always"
             $authResult=$authContext.AcquireTokenAsync($resourceURI, $ClientID, $RedirectUri, $platformParameters)
             }
-if ($authResult.Status -eq "RanToCompletion") {Write-Host ":Succeeded" -ForegroundColor Green }
+sleep 2
+if ($authResult.Status -eq "RanToCompletion"){Write-Host ":Succeeded" -ForegroundColor Green}else{Write-Host ":Failed" -ForegroundColor red}
 $accessToken = $authResult
 Return $accessToken
 }
@@ -177,10 +184,11 @@ if ($authResult.Status -ne "Faulted")
         try   {
             $Data=Invoke-RestMethod -Headers @{Authorization = "Bearer $accessToken"} -Uri $apiUrl -Method Get
             if ($data.value){
-                            $data.value | select createdDateTime,userPrincipalName,clientAppUsed,userAgent,
+                            $data.value | select createdDateTime,userPrincipalName,appDisplayName,clientAppUsed,userAgent,conditionalAccessStatus,
                             @{N="operatingSystem";E={$_.deviceDetail.operatingSystem}},
                             @{N="browser";E={$_.deviceDetail.browser}},ipAddress,authenticationRequirement,
                             @{N="Status";E={$_.Status.errorCode}},
+                            @{N="additionalDetails";E={$_.Status.additionalDetails}},
                             @{N="failureReason";E={$_.Status.failureReason}} |`
                             export-csv $exportFileName -NoTypeInformation -Append 
                            }
@@ -229,10 +237,11 @@ if ($data."@odata.nextLink" -ne $null)
                 #Export to csv
                 if ($data.value) 
                         {                           
-                         $data.value | select createdDateTime,userPrincipalName,clientAppUsed,userAgent,
+                         $data.value | select createdDateTime,userPrincipalName,appDisplayName,clientAppUsed,userAgent,conditionalAccessStatus,
                          @{N="operatingSystem";E={$_.deviceDetail.operatingSystem}},
                          @{N="browser";E={$_.deviceDetail.browser}},ipAddress,authenticationRequirement,
                          @{N="Status";E={$_.Status.errorCode}},
+                         @{N="additionalDetails";E={$_.Status.additionalDetails}},
                          @{N="failureReason";E={$_.Status.failureReason}} | `
                          export-csv $exportFileName -NoTypeInformation -Append
                         }                  
@@ -249,4 +258,3 @@ else       {
                         Write-Host "logs has has been exported to path" $(($(Get-Location).path) + "\" + "$exportFileName") -f Green
                       }
            } 
-
