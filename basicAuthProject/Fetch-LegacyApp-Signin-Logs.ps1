@@ -226,7 +226,10 @@ if ($data."@odata.nextLink" -ne $null)
                 #check the current auth token status.                
                 $MinToExpire=(($authResult.result.ExpiresOn.LocalDateTime) - (get-date)).minutes
                 Write-Host "AuthToken Age $MinToExpire Min " -NoNewline 
-                if($MinToExpire -lt 5) {$Global:authResult=GetAuthorizationToken}
+                if($MinToExpire -lt 5) {
+                $Global:authResult=GetAuthorizationToken
+                $accessToken=$authResult.result.AccessToken
+                }
 
                 #Fetch the next Odata Link
                 
