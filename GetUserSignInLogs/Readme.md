@@ -13,5 +13,5 @@ GetSignInLogs -upn sc@lab365.gq -DateGTE 2019-02-10 -getfailed
 
 ### If you do not know how to setup the Azure App and permissions check out my blogs serices on working wiht Graph API using powershell.
 
-> https://www.sunilchauhan.info/2019/02/working-with-microsoft-graph-api-using.html
-> https://www.sunilchauhan.info/2019/02/working-with-microsoft-graph-api-using_10.html
+> https://sunil-chauhan.blogspot.com/2019/02/working-with-microsoft-graph-api-using.html
+> https://sunil-chauhan.blogspot.com/2019/02/working-with-microsoft-graph-api-using_10.html
